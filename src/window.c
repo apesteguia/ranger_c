@@ -96,7 +96,7 @@ void main_program(WINDOW *win, char *path)
 {
     MENU *menu;
     ITEM **menu_items;
-    char **dirs, c, *path2;
+    char **dirs, c, *path2, aux[MAX_LENGTH];
     int length;
     int i;
     bool b;
@@ -146,6 +146,7 @@ void main_program(WINDOW *win, char *path)
             }
             else if (b == true)
             {
+                chdir(path);
                 getcwd(path2, MAX_LENGTH);
                 strncat(path2, "/", MAX_LENGTH);
                 b = false;
