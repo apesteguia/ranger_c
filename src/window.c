@@ -96,9 +96,10 @@ void main_program(WINDOW *win, char *path)
 {
     MENU *menu;
     ITEM **menu_items;
-    char **dirs, c;
+    char **dirs, c, *path2;
     int length;
     int i;
+    bool b;
 
     dirs = dir_items(path);
     length = dir_length(dirs);
@@ -110,9 +111,10 @@ void main_program(WINDOW *win, char *path)
     menu = new_menu(menu_items);
     attach_menu(win, menu);
     wrefresh(win);
-    refresh();
 
     i = 0;
+    b = true;
+    refresh();
     while ((c = wgetch(win)) != KEY_F(1))
     {
         switch (c)
@@ -134,21 +136,39 @@ void main_program(WINDOW *win, char *path)
             wrefresh(win);
             break;
         case '\n':
+            path2 = (char *)malloc(MAX_LENGTH * sizeof(char));
+            getcwd(path2, MAX_LENGTH);
+            if (b == false)
+            {
+                printf("%d", i);
+                strncat(path2, "/", MAX_LENGTH);
+                strncat(path2, dirs[i], MAX_LENGTH);
+            }
+            else if (b == true)
+            {
+                getcwd(path2, MAX_LENGTH);
+                strncat(path2, "/", MAX_LENGTH);
+                b = false;
+            }
+
             unpost_menu(menu);
             free_menu(menu);
             free_dir_items(menu_items);
             free_dir(dirs);
-
-            dirs = dir_items(path);
+            dirs = dir_items(path2);
+            chdir(path2);
+            free(path2);
+            path2 = "";
             length = dir_length(dirs);
             menu_items = (ITEM **)malloc((length + 1) * sizeof(ITEM *));
             for (int i = 0; i < length; i++)
                 menu_items[i] = new_item(dirs[i], "");
             menu_items[length] = NULL;
-
             menu = new_menu(menu_items);
             attach_menu(win, menu);
             wrefresh(win);
+            refresh();
+            i = 0;
             break;
         case 'q':
             end_window(win);
@@ -170,7 +190,6 @@ void attach_menu(WINDOW *win, MENU *m)
 
 void end_window(WINDOW *win)
 {
-    sleep(4);
     delwin(win);
     endwin();
 }
