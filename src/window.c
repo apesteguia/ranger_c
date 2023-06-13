@@ -8,6 +8,12 @@ int dir_length(char **dirs)
         i++;
     return i;
 }
+int compare_strings(const void *a, const void *b)
+{
+    const char *str1 = *(const char **)a;
+    const char *str2 = *(const char **)b;
+    return strcmp(str1, str2);
+}
 
 char **dir_items(char *path)
 {
@@ -33,6 +39,7 @@ char **dir_items(char *path)
     current_dirs[i] = NULL;
 
     closedir(dir);
+    qsort(current_dirs, i, sizeof(current_dirs[0]), compare_strings);
 
     return current_dirs;
 }
